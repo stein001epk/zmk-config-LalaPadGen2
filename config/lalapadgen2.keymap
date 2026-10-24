@@ -1,3 +1,13 @@
+/*
+ * LaLaPadGen2 keymap カスタム案（JIS 版）
+ * ベース: ShiniNet/zmk-config-LalaPadGen2 のデフォルトキーマップ
+ * ★ = デフォルトからの変更点
+ * 前提: Windows 側のキーボード配列が JIS（日本語キーボード 106/109 キー）のまま
+ *       US 版と同じ位置で同じ文字が出るように、記号だけ JIS 用のキーコードに置き換えてある
+ *       （Shift を押したときの文字も US 版と同じ）
+ * 使い方: リポジトリには config/lalapadgen2.keymap という名前で置くこと
+ */
+
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/zip_dynamic_scale.h>
 #include <behaviors.dtsi>
@@ -14,6 +24,9 @@
 &mt { quick-tap-ms = <200>; };
 
 &lt { quick-tap-ms = <200>; };
+
+// ★JIS 版: Caps Word 中に _ を打っても途切れないようにする（JIS の _ は Shift＋ろ キー）
+&caps_word { continue-list = <LS(INTERNATIONAL_1) BACKSPACE DELETE>; };
 
 / {
     behaviors {
@@ -37,49 +50,216 @@
             bindings = <&kp>, <&kp>;
         };
 
+        // ★JIS 版: ベースの - キー用。mt2 と同じタイミングで、タップ = -、長押し = =
+        //   中身は下の変換（jp_minus / jp_eq）なので、Shift 時は _ と + になる
+        //   使うときは &mt2_jp 0 0（0 はダミー）
+        mt2_jp: mod_tap2_jp {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <200>;
+            require-prior-idle-ms = <125>;
+            bindings = <&jp_eq>, <&jp_minus>;
+        };
+
         tap_dance_layer_1and2: tap_dance_layer_1and2 {
             compatible = "zmk,behavior-tap-dance";
             label = "td_mo12";
             #binding-cells = <0>;
             bindings = <&mo 1>, <&mo 2>;
         };
+
+        // ===== ★JIS 版: US 版と同じ文字を出すための変換 =====
+        // bindings の左が通常時、右が Shift を押しているとき（Shift は外してから送る）
+
+        // -   Shift で _
+        jp_minus: jp_minus {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp MINUS>, <&kp LS(INTERNATIONAL_1)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // =   Shift で +
+        jp_eq: jp_eq {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp LS(MINUS)>, <&kp LS(SEMICOLON)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // @   Shift でも @
+        jp_at: jp_at {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp LEFT_BRACKET>, <&kp LEFT_BRACKET>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // ^   Shift でも ^
+        jp_caret: jp_caret {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp EQUAL>, <&kp EQUAL>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // `   Shift で ~
+        jp_grave: jp_grave {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp LS(LEFT_BRACKET)>, <&kp LS(EQUAL)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // '   Shift で "
+        jp_quote: jp_quote {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp LS(N7)>, <&kp LS(N2)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // ;   Shift で :
+        jp_semi: jp_semi {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp SEMICOLON>, <&kp APOSTROPHE>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // :   Shift でも :
+        jp_colon: jp_colon {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp APOSTROPHE>, <&kp APOSTROPHE>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // \   Shift で |
+        jp_bsls: jp_bsls {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp INTERNATIONAL_1>, <&kp LS(INTERNATIONAL_3)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 2   Shift で @
+        jp_2: jp_2 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N2>, <&kp LEFT_BRACKET>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 6   Shift で ^
+        jp_6: jp_6 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N6>, <&kp EQUAL>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 7   Shift で &
+        jp_7: jp_7 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N7>, <&kp LS(N6)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 8   Shift で *
+        jp_8: jp_8 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N8>, <&kp LS(APOSTROPHE)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 9   Shift で (
+        jp_9: jp_9 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N9>, <&kp LS(N8)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // 0   Shift で )
+        jp_0: jp_0 {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp N0>, <&kp LS(N9)>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
     };
 
     combos {
         compatible = "zmk,combos";
 
+        // ★変更: Esc（Q＋W）と Tab（A＋S）はベースレイヤーでだけ有効
+        //   （L1 中に 1＋2 や 6＋7 を速く打ったとき Esc/Tab に化けないように）
         CONBO_ESC {
             bindings = <&kp ESCAPE>;
             key-positions = <0 1>;
+            layers = <0>;
         };
 
         COMBO_TAB {
             bindings = <&kp TAB>;
             key-positions = <10 11>;
+            layers = <0>;
+        };
+
+        // ★追加: 親指の同時押しで IME を切り替える（単独で押したときの L1/L2/Space/Enter は今まで通り）
+        //   左親指 L1＋Space → 英数 / 右親指 L2＋Enter → かな
+        //   同じ親指で押す2キーだから、普通の打鍵中に両方が同時に押されることはほぼ無い
+        //   timeout-ms : 2キーがこの時間内に揃ったら同時押し扱い。Space/Enter の出力は最大この分だけ待たされる
+        //                Space を押したつもりで切り替わることがあるなら 20〜30 に詰める
+        //   layers     : ベースレイヤーでだけ有効（L1/L2 を押している最中の Space/Enter は待たされない）
+        COMBO_EISU {
+            bindings = <&kp LANGUAGE_2>;
+            key-positions = <33 34>;
+            timeout-ms = <40>;
+            layers = <0>;
+        };
+
+        COMBO_KANA {
+            bindings = <&kp LANGUAGE_1>;
+            key-positions = <37 38>;
+            timeout-ms = <40>;
+            layers = <0>;
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
 
+        // ★ベースの変更点
+        //   英数/かな → 親指の同時押しコンボへ（combos の COMBO_EISU / COMBO_KANA）。L1/L2 キー自体は元のまま
+        //   右下段（旧 英数・かな）→ _ と @
+        //   左 5Way 押し込み（旧 none）→ Caps Word
+        //   右 5Way 押し込み（旧 none）→ Win+Shift+S（範囲スクショ）
+        //   JIS 版: - キー、_、@、\ を JIS 用に置き換え
         DEFAULT_LAYER {
             display-name = "Default";
             bindings = <
-&kp Q              &kp W      &kp E         &kp R      &kp T                                     &kp Y      &kp U     &kp I           &kp O           &kp P
-&kp A              &kp S      &kp D         &kp F      &kp G                                     &kp H      &kp J     &kp K           &kp L           &mt2 EQUAL MINUS
-&mt2 LEFT_SHIFT Z  &kp X      &kp C         &kp V      &kp B                                     &kp N      &kp M     &kp COMMA       &kp PERIOD      &kp SLASH
-&kp LCTRL          &kp LWIN   &kp LEFT_ALT  &mo 1      &kp SPACE  &kp LEFT_SHIFT  &kp BACKSPACE  &kp ENTER  &mo 2     &kp LANGUAGE_2  &kp LANGUAGE_1  &kp BACKSLASH
-                   &none      &kp RIGHT     &kp DOWN   &kp LEFT   &kp UP          &kp UP         &kp LEFT   &kp DOWN  &kp RIGHT       &none
-&mkp LCLK          &mkp RCLK  &mkp MCLK                                                                               &mkp LCLK       &mkp RCLK       &mkp MCLK
-&mkp MB4           &mkp MB5   &kp LG(TAB)   &kp LG(D)  &kp LCTRL                                 &mkp MB4   &mkp MB5  &kp LG(TAB)     &kp LG(D)       &kp LCTRL
+&kp Q              &kp W       &kp E         &kp R                 &kp T                                     &kp Y      &kp U     &kp I                 &kp O                    &kp P
+&kp A              &kp S       &kp D         &kp F                 &kp G                                     &kp H      &kp J     &kp K                 &kp L                    &mt2_jp 0 0
+&mt2 LEFT_SHIFT Z  &kp X       &kp C         &kp V                 &kp B                                     &kp N      &kp M     &kp COMMA             &kp PERIOD               &kp SLASH
+&kp LCTRL          &kp LWIN    &kp LEFT_ALT  &mo 1                 &kp SPACE  &kp LEFT_SHIFT  &kp BACKSPACE  &kp ENTER  &mo 2                 &kp LS(INTERNATIONAL_1)  &jp_at           &jp_bsls
+                   &caps_word  &kp RIGHT     &kp DOWN              &kp LEFT   &kp UP          &kp UP         &kp LEFT   &kp DOWN  &kp RIGHT             &kp LG(LS(S))
+&mkp LCLK          &mkp RCLK   &mkp MCLK                                                                                                              &mkp LCLK                &mkp RCLK        &mkp MCLK
+&mkp MB4           &mkp MB5    &kp LG(TAB)   &kp LG(D)             &kp LCTRL                                 &mkp MB4   &mkp MB5  &kp LG(TAB)           &kp LG(D)                &kp LCTRL
             >;
         };
 
+        // JIS 版: Shift＋数字で出る記号を US 版と揃えるため、2/6/7/8/9/0 を変換に置き換え
         SECONDARY_LAYER {
             display-name = "secondary_layer";
             bindings = <
-&kp NUMBER_1      &kp NUMBER_2       &kp NUMBER_3  &kp NUMBER_4  &kp N5                    &kp KP_NUMLOCK    &kp KP_NUMBER_7    &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp KP_PLUS
-&kp NUMBER_6      &kp N7             &kp N8        &kp N9        &kp N0                    &trans            &kp KP_NUMBER_4    &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp KP_MINUS
+&kp NUMBER_1      &jp_2              &kp NUMBER_3  &kp NUMBER_4  &kp N5                    &kp KP_NUMLOCK    &kp KP_NUMBER_7    &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp KP_PLUS
+&jp_6             &jp_7              &jp_8         &jp_9         &jp_0                     &trans            &kp KP_NUMBER_4    &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp KP_MINUS
 &kp F6            &kp F7             &kp F8        &kp F9        &kp F10                   &trans            &kp KP_NUMBER_1    &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp KP_ASTERISK
 &trans            &trans             &trans        &trans        &trans   &trans  &kp DEL  &trans            &trans             &kp KP_NUMBER_0  &kp KP_DOT       &kp KP_DIVIDE
                   &trans             &trans        &trans        &trans   &trans  &trans   &trans            &trans             &trans           &trans
@@ -88,16 +268,22 @@
             >;
         };
 
+        // ★L2 の変更点（Shift 込みで3キー同時押しだった記号を2キーに）
+        //   P 位置 : PrtSc       → "
+        //   - 位置 : ScrollLock  → :
+        //   N 位置 : (透過)      → =
+        //   / 位置 : Pause       → PrtSc（P 位置から移動）
+        //   JIS 版: 記号はすべて JIS 用のキーコードか変換（jp_*）に置き換え
         TERTIARY_LAYER {
             display-name = "tertiary_layer";
             bindings = <
-&kp EXCLAMATION  &kp AT_SIGN    &kp HASH      &kp DOLLAR            &kp PERCENT                            &kp PAGE_UP    &kp HOME  &kp UP_ARROW    &kp END    &kp PRINTSCREEN
-&kp CARET        &kp AMPERSAND  &kp ASTERISK  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS                  &kp PAGE_DOWN  &kp LEFT  &kp DOWN_ARROW  &kp RIGHT  &kp SCROLLLOCK
-&kp GRAVE        &kp SQT        &kp SEMI      &kp LEFT_BRACKET      &kp RIGHT_BRACKET                      &trans         &mkp MB4  &trans          &mkp MB5   &kp PAUSE_BREAK
-&trans           &trans         &trans        &trans                &trans                 &trans  &trans  &trans         &trans    &trans          &trans     &trans
-                 &trans         &trans        &trans                &trans                 &trans  &trans  &trans         &trans    &trans          &trans
-&trans           &trans         &trans                                                                                              &trans          &trans     &trans
-&trans           &trans         &trans        &trans                &trans                                 &trans         &trans    &trans          &trans     &trans
+&kp EXCLAMATION  &jp_at          &kp HASH      &kp DOLLAR         &kp PERCENT                            &kp PAGE_UP    &kp HOME  &kp UP_ARROW    &kp END    &kp LS(N2)
+&jp_caret        &kp LS(N6)      &kp LS(SQT)   &kp LS(N8)         &kp LS(N9)                             &kp PAGE_DOWN  &kp LEFT  &kp DOWN_ARROW  &kp RIGHT  &jp_colon
+&jp_grave        &jp_quote       &jp_semi      &kp RIGHT_BRACKET  &kp NON_US_HASH                        &jp_eq         &mkp MB4  &trans          &mkp MB5   &kp PRINTSCREEN
+&trans           &trans          &trans        &trans             &trans                 &trans  &trans  &trans         &trans    &trans          &trans     &trans
+                 &trans          &trans        &trans             &trans                 &trans  &trans  &trans         &trans    &trans          &trans
+&trans           &trans          &trans                                                                                           &trans          &trans     &trans
+&trans           &trans          &trans        &trans             &trans                                 &trans         &trans    &trans          &trans     &trans
             >;
         };
 
