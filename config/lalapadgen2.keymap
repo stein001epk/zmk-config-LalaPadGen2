@@ -211,22 +211,24 @@
             layers = <0>;
         };
 
-        // ★追加: 親指の同時押しで IME を切り替える（単独で押したときの L1/L2/Space/Enter は今まで通り）
-        //   左親指 L1＋Space → 英数 / 右親指 L2＋Enter → かな
-        //   同じ親指で押す2キーだから、普通の打鍵中に両方が同時に押されることはほぼ無い
-        //   timeout-ms : 2キーがこの時間内に揃ったら同時押し扱い。Space/Enter の出力は最大この分だけ待たされる
-        //                Space を押したつもりで切り替わることがあるなら 20〜30 に詰める
-        //   layers     : ベースレイヤーでだけ有効（L1/L2 を押している最中の Space/Enter は待たされない）
+        // ★変更: 英数/かなは人差し指の同時押し（薙刀式と同じ組み合わせ）
+        //   F＋G → 英数 / H＋J → かな。人差し指1本で2つのキーの境目を押す
+        //   同じ指で打つ2キーなので、普通の打鍵中に両方が同時に押されることはまず無い
+        //   失敗しても f / g / h / j のどれかが1文字入るだけ
+        //   timeout-ms : 2キーがこの時間内に揃ったら同時押し扱い
+        //                押したのに切り替わらないことが多いなら 50〜60、勝手に切り替わるなら 30 に
+        //   勝手に切り替わる場合は require-prior-idle-ms = <100>; を足すと、打鍵の直後は発動しなくなる
+        //   layers     : ベースレイヤーでだけ有効
         COMBO_EISU {
             bindings = <&kp LANGUAGE_2>;
-            key-positions = <33 34>;
+            key-positions = <13 14>;
             timeout-ms = <40>;
             layers = <0>;
         };
 
         COMBO_KANA {
             bindings = <&kp LANGUAGE_1>;
-            key-positions = <37 38>;
+            key-positions = <15 16>;
             timeout-ms = <40>;
             layers = <0>;
         };
@@ -236,7 +238,7 @@
         compatible = "zmk,keymap";
 
         // ★ベースの変更点
-        //   英数/かな → 親指の同時押しコンボへ（combos の COMBO_EISU / COMBO_KANA）。L1/L2 キー自体は元のまま
+        //   英数/かな → F＋G / H＋J の同時押しコンボへ（combos の COMBO_EISU / COMBO_KANA）。L1/L2 キー自体は元のまま
         //   右下段（旧 英数・かな）→ _ と @
         //   左 5Way 押し込み（旧 none）→ Caps Word
         //   右 5Way 押し込み（旧 none）→ Win+Shift+S（範囲スクショ）
